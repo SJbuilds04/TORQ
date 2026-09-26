@@ -7,6 +7,14 @@ cardboard disc, turn the disc, and it steers a real PC game.
 
 No app store, no controller, no hardware beyond a piece of cardboard.
 
+<p align="center">
+  <img src="docs/demo.gif" alt="A cardboard disc becomes a steering wheel; the on-screen wheel turns and the steering value runs from -58 to +74" width="720">
+</p>
+
+<p align="center">
+  <a href="docs/torq-demo.mp4"><b>▶ Watch the full 36-second video (with sound)</b></a>
+</p>
+
 ```
 PHONE  ──wss──►  bridge.js  ──stdin──►  input_driver.py  ──►  GAME
 (sensors)         (Node)                 (Windows input)
