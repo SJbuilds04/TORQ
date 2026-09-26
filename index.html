@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<title>TORQ — Tilt and Orientation Rotation Controller</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="description" content="TORQ - Tilt and Orientation Rotation Controller. Turn your phone into a physical racing-game steering wheel using its motion sensors.">
+<meta name="theme-color" content="#08090c">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="stylesheet" href="style.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='40' fill='none' stroke='%23fff' stroke-width='10'/><circle cx='50' cy='50' r='12' fill='%23fff'/></svg>">
+</head>
+<body>
+
+<div id="app" class="app">
+
+  <!-- ============================================================= -->
+  <!-- 1. HERO / LANDING                                             -->
+  <!-- ============================================================= -->
+  <section class="view view--hero is-active" id="view-hero">
+    <div class="hero__art" aria-hidden="true">
+      <svg viewBox="0 0 400 320" preserveAspectRatio="xMidYMid slice">
+        <defs>
+          <linearGradient id="hSky" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#0d1420"/>
+            <stop offset=".55" stop-color="#0a0e16"/>
+            <stop offset="1" stop-color="#06070a"/>
+          </linearGradient>
+          <linearGradient id="hBody" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#4d5a6d"/>
+            <stop offset=".42" stop-color="#242c39"/>
+            <stop offset="1" stop-color="#0f1319"/>
+          </linearGradient>
+          <linearGradient id="hGlass" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#3c4a5e"/>
+            <stop offset="1" stop-color="#11161d"/>
+          </linearGradient>
+          <linearGradient id="hLamp" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0" stop-color="#ff1b3d" stop-opacity=".25"/>
+            <stop offset=".18" stop-color="#ff3550"/>
+            <stop offset=".5" stop-color="#ff6b7d"/>
+            <stop offset=".82" stop-color="#ff3550"/>
+            <stop offset="1" stop-color="#ff1b3d" stop-opacity=".25"/>
+          </linearGradient>
+          <filter id="hGlow" x="-60%" y="-300%" width="220%" height="700%">
+            <feGaussianBlur stdDeviation="9"/>
+          </filter>
+          <filter id="hSoft" x="-40%" y="-40%" width="180%" height="180%">
+            <feGaussianBlur stdDeviation="16"/>
+          </filter>
+        </defs>
+
+        <rect width="400" height="320" fill="url(#hSky)"/>
+        <!-- wet asphalt reflection streaks -->
+        <g opacity=".55">
+          <ellipse cx="200" cy="286" rx="150" ry="10" fill="#ff2038" filter="url(#hSoft)" opacity=".5"/>
+          <rect x="92" y="250" width="216" height="58" fill="#ff2038" opacity=".10" filter="url(#hSoft)"/>
+        </g>
+        <!-- taillight motion trails streaming off both sides of the car -->
+        <g filter="url(#hGlow)">
+          <rect x="-40" y="214" width="146" height="3" fill="#ff2038" opacity=".45"/>
+          <rect x="296" y="214" width="146" height="3" fill="#ff2038" opacity=".45"/>
+          <rect x="-30" y="128" width="120" height="2" fill="#2f6bff" opacity=".28"/>
+        </g>
+
+        <!-- car rear -->
+        <g>
+          <path d="M92 250 Q88 196 118 178 L146 152 Q200 138 254 152 L282 178 Q312 196 308 250 Z" fill="url(#hBody)"/>
+          <path d="M92 250 Q88 196 118 178 L146 152 Q200 138 254 152 L282 178 Q312 196 308 250" fill="none" stroke="#8fa3bd" stroke-opacity=".35" stroke-width="1.5"/>
+          <path d="M150 158 Q200 146 250 158 L268 180 Q200 170 132 180 Z" fill="url(#hGlass)" opacity=".9"/>
+          <path d="M96 208 Q200 192 304 208" fill="none" stroke="#ffffff" stroke-opacity=".10" stroke-width="2"/>
+          <!-- light bar -->
+          <g filter="url(#hGlow)"><rect x="104" y="212" width="192" height="8" rx="4" fill="url(#hLamp)"/></g>
+          <rect x="104" y="212" width="192" height="7" rx="3.5" fill="url(#hLamp)"/>
+          <!-- diffuser / bumper -->
+          <path d="M100 246 L300 246 L296 266 Q200 274 104 266 Z" fill="#090b0f"/>
+          <g fill="#14171d">
+            <rect x="150" y="252" width="6" height="14" rx="2"/><rect x="168" y="252" width="6" height="14" rx="2"/>
+            <rect x="186" y="252" width="6" height="14" rx="2"/><rect x="204" y="252" width="6" height="14" rx="2"/>
+            <rect x="222" y="252" width="6" height="14" rx="2"/><rect x="240" y="252" width="6" height="14" rx="2"/>
+          </g>
+          <!-- wheels -->
+          <rect x="82" y="238" width="18" height="34" rx="6" fill="#0a0c10"/>
+          <rect x="300" y="238" width="18" height="34" rx="6" fill="#0a0c10"/>
+        </g>
+      </svg>
+      <div class="hero__scrim"></div>
+    </div>
+
+    <header class="hero__bar">
+      <div class="brand">
+        <span class="brand__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="18" height="18"><path fill="currentColor" d="M17.5 7h-11A4.5 4.5 0 0 0 2 11.5v2A3.5 3.5 0 0 0 5.5 17c1.2 0 2-.5 2.7-1.2l.6-.6c.3-.3.7-.45 1.1-.45h4.2c.4 0 .8.15 1.1.45l.6.6c.7.7 1.5 1.2 2.7 1.2A3.5 3.5 0 0 0 22 13.5v-2A4.5 4.5 0 0 0 17.5 7ZM8 13H6.5v1.5h-1V13H4v-1h1.5v-1.5h1V12H8v1Zm8.75 1a1 1 0 1 1 0-2 1 1 0 0 1 0 2Zm2-2.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"/></svg>
+        </span>
+        <span class="brand__text">TORQ</span>
+      </div>
+      <button class="icon-btn" data-goto="view-settings" aria-label="Settings">
+        <svg viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M12 15.5A3.5 3.5 0 1 1 15.5 12 3.5 3.5 0 0 1 12 15.5Zm7.43-2.53.02-.97-.02-.97 2.01-1.54a.5.5 0 0 0 .12-.64l-1.9-3.3a.5.5 0 0 0-.61-.22l-2.37.95a7.6 7.6 0 0 0-1.68-.97l-.36-2.52a.5.5 0 0 0-.5-.42h-3.8a.5.5 0 0 0-.5.42l-.36 2.52c-.6.24-1.16.57-1.68.97l-2.37-.95a.5.5 0 0 0-.61.22l-1.9 3.3a.5.5 0 0 0 .12.64L4.55 11l-.02.97.02.97-2.01 1.54a.5.5 0 0 0-.12.64l1.9 3.3c.12.22.39.31.61.22l2.37-.95c.52.4 1.08.73 1.68.97l.36 2.52c.04.24.25.42.5.42h3.8c.25 0 .46-.18.5-.42l.36-2.52c.6-.24 1.16-.57 1.68-.97l2.37.95c.22.09.49 0 .61-.22l1.9-3.3a.5.5 0 0 0-.12-.64Z"/></svg>
+      </button>
+    </header>
+
+    <div class="hero__body">
+      <h1 class="hero__title">Turn<br>Your Phone<br>Into a<br><span class="grad">Steering Wheel</span></h1>
+      <p class="hero__sub">Use your phone's motion sensors to control your game.</p>
+      <button class="btn btn--primary btn--xl" id="btnGetStarted">
+        <span>Get Started</span>
+        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M13.2 5.3 19.9 12l-6.7 6.7-1.4-1.4 4.3-4.3H4v-2h12.1l-4.3-4.3 1.4-1.4Z"/></svg>
+      </button>
+      <button class="btn btn--ghost btn--xl" id="btnHowItWorks">
+        <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M8 5.5v13l11-6.5-11-6.5Z"/></svg>
+        <span>How it works</span>
+      </button>
+    </div>
+  </section>
+
+
+  <!-- ============================================================= -->
+  <!-- 2. CONTROLLER                                                 -->
+  <!-- ============================================================= -->
+  <section class="view view--controller" id="view-controller">
+    <header class="topbar">
+      <div class="topbar__lead">
+        <h2 class="topbar__title">Controller</h2>
+        <p class="status-line"><span class="dot" id="statusDot"></span><span id="statusText">Starting sensors…</span></p>
+      </div>
+      <button class="icon-btn" data-goto="view-settings" aria-label="Settings">
+        <svg viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M12 15.5A3.5 3.5 0 1 1 15.5 12 3.5 3.5 0 0 1 12 15.5Zm7.43-2.53.02-.97-.02-.97 2.01-1.54a.5.5 0 0 0 .12-.64l-1.9-3.3a.5.5 0 0 0-.61-.22l-2.37.95a7.6 7.6 0 0 0-1.68-.97l-.36-2.52a.5.5 0 0 0-.5-.42h-3.8a.5.5 0 0 0-.5.42l-.36 2.52c-.6.24-1.16.57-1.68.97l-2.37-.95a.5.5 0 0 0-.61.22l-1.9 3.3a.5.5 0 0 0 .12.64L4.55 11l-.02.97.02.97-2.01 1.54a.5.5 0 0 0-.12.64l1.9 3.3c.12.22.39.31.61.22l2.37-.95c.52.4 1.08.73 1.68.97l.36 2.52c.04.24.25.42.5.42h3.8c.25 0 .46-.18.5-.42l.36-2.52c.6-.24 1.16-.57 1.68-.97l2.37.95c.22.09.49 0 .61-.22l1.9-3.3a.5.5 0 0 0-.12-.64Z"/></svg>
+      </button>
+    </header>
+
+    <div class="stage">
+      <!-- arc gauge -->
+      <svg class="gauge" id="gauge" viewBox="0 0 300 116" aria-hidden="true">
+        <defs>
+          <linearGradient id="gLeft" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0" stop-color="#2f6bff" stop-opacity=".15"/>
+            <stop offset=".45" stop-color="#3f8bff"/>
+            <stop offset="1" stop-color="#7fc4ff"/>
+          </linearGradient>
+          <linearGradient id="gRight" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0" stop-color="#ff8f9c"/>
+            <stop offset=".55" stop-color="#ff3b4e"/>
+            <stop offset="1" stop-color="#ff1b3d" stop-opacity=".15"/>
+          </linearGradient>
+        </defs>
+        <g id="gaugeTicks" class="gauge__ticks"></g>
+        <path class="gauge__arc" d="M 63.5 80.5 A 92 92 0 0 1 150 20" stroke="url(#gLeft)"/>
+        <path class="gauge__arc" d="M 150 20 A 92 92 0 0 1 236.5 80.5" stroke="url(#gRight)"/>
+        <line class="gauge__center" x1="150" y1="2" x2="150" y2="15"/>
+        <g id="gaugeMarker" class="gauge__marker">
+          <rect x="-5" y="-11" width="10" height="22" rx="3"/>
+        </g>
+      </svg>
+
+      <!-- steering wheel -->
+      <div class="wheel">
+        <div class="wheel__glow" id="wheelGlow"></div>
+        <div class="wheel__rotor" id="wheelRotor">
+          <svg viewBox="0 0 400 400" aria-hidden="true">
+            <defs>
+              <linearGradient id="rimG" x1=".2" y1="0" x2=".8" y2="1">
+                <stop offset="0" stop-color="#565b66"/>
+                <stop offset=".28" stop-color="#23262d"/>
+                <stop offset=".62" stop-color="#101216"/>
+                <stop offset=".85" stop-color="#31353d"/>
+                <stop offset="1" stop-color="#191b20"/>
+              </linearGradient>
+              <linearGradient id="spokeG" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0" stop-color="#41454e"/>
+                <stop offset=".5" stop-color="#22252b"/>
+                <stop offset="1" stop-color="#101216"/>
+              </linearGradient>
+              <radialGradient id="hubG" cx=".34" cy=".28" r=".85">
+                <stop offset="0" stop-color="#60656f"/>
+                <stop offset=".5" stop-color="#2a2d34"/>
+                <stop offset="1" stop-color="#0d0f13"/>
+              </radialGradient>
+              <linearGradient id="metalG" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0" stop-color="#f2f5fa"/>
+                <stop offset=".5" stop-color="#98a0ad"/>
+                <stop offset="1" stop-color="#e2e7ef"/>
+              </linearGradient>
+              <filter id="markGlow" x="-200%" y="-200%" width="500%" height="500%">
+                <feGaussianBlur stdDeviation="5"/>
+              </filter>
+            </defs>
+
+            <!-- rim -->
+            <circle cx="200" cy="200" r="166" fill="none" stroke="url(#rimG)" stroke-width="38"/>
+            <circle cx="200" cy="200" r="184.5" fill="none" stroke="#ffffff" stroke-opacity=".07" stroke-width="1.5"/>
+            <circle cx="200" cy="200" r="147.5" fill="none" stroke="#000000" stroke-opacity=".55" stroke-width="2"/>
+            <circle cx="200" cy="200" r="152" fill="none" stroke="#ffffff" stroke-opacity=".10" stroke-width="1" stroke-dasharray="1.5 7"/>
+            <!-- leather grips -->
+            <path d="M44 143.2 A166 166 0 0 1 143.2 44" fill="none" stroke="#0c0d11" stroke-opacity=".9" stroke-width="42" stroke-linecap="round"/>
+            <path d="M256.8 44 A166 166 0 0 1 356 143.2" fill="none" stroke="#0c0d11" stroke-opacity=".9" stroke-width="42" stroke-linecap="round"/>
+            <path d="M44 143.2 A166 166 0 0 1 143.2 44" fill="none" stroke="#ffffff" stroke-opacity=".05" stroke-width="42" stroke-linecap="round" stroke-dasharray="2 9"/>
+            <path d="M256.8 44 A166 166 0 0 1 356 143.2" fill="none" stroke="#ffffff" stroke-opacity=".05" stroke-width="42" stroke-linecap="round" stroke-dasharray="2 9"/>
+
+            <!-- spokes -->
+            <g>
+              <rect x="56" y="179" width="118" height="42" rx="15" fill="url(#spokeG)"/>
+              <rect x="226" y="179" width="118" height="42" rx="15" fill="url(#spokeG)"/>
+              <rect x="179" y="230" width="42" height="116" rx="15" fill="url(#spokeG)"/>
+              <rect x="56" y="180" width="118" height="2" rx="1" fill="#ffffff" fill-opacity=".10"/>
+              <rect x="226" y="180" width="118" height="2" rx="1" fill="#ffffff" fill-opacity=".10"/>
+            </g>
+            <!-- spoke buttons -->
+            <g fill="#0b0c10">
+              <rect x="80" y="188" width="30" height="24" rx="8"/>
+              <rect x="118" y="188" width="30" height="24" rx="8"/>
+              <rect x="252" y="188" width="30" height="24" rx="8"/>
+              <rect x="290" y="188" width="30" height="24" rx="8"/>
+            </g>
+            <g fill="#ffffff" fill-opacity=".07">
+              <rect x="80" y="188" width="30" height="8" rx="4"/>
+              <rect x="118" y="188" width="30" height="8" rx="4"/>
+              <rect x="252" y="188" width="30" height="8" rx="4"/>
+              <rect x="290" y="188" width="30" height="8" rx="4"/>
+            </g>
+
+            <!-- hub -->
+            <circle cx="200" cy="200" r="66" fill="#08090c"/>
+            <circle cx="200" cy="200" r="62" fill="url(#hubG)"/>
+            <circle cx="200" cy="200" r="49" fill="none" stroke="#ffffff" stroke-opacity=".09" stroke-width="1.5"/>
+            <path d="M200 170 L221 226 L200 213 L179 226 Z" fill="url(#metalG)"/>
+
+            <!-- top marker -->
+            <g filter="url(#markGlow)"><rect x="192" y="22" width="16" height="36" rx="5" fill="#ff2038"/></g>
+            <rect x="192.5" y="23" width="15" height="34" rx="4.5" fill="#ff3348"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- readout -->
+      <div class="readout">
+        <div class="readout__end">
+          <b>&minus;100</b><small>Left</small>
+        </div>
+        <div class="readout__main">
+          <div class="readout__value" id="steerValue">0</div>
+          <div class="readout__label">Steering</div>
+        </div>
+        <div class="readout__end readout__end--r">
+          <b>+100</b><small>Right</small>
+        </div>
+      </div>
+
+      <div class="chips">
+        <div class="chip"><span class="chip__k">Angle</span><span class="chip__v" id="chipAngle">0°</span></div>
+        <div class="chip"><span class="chip__k">Status</span><span class="chip__v"><i class="dot" id="chipDot"></i><span id="chipStatus">Center</span></span></div>
+        <div class="chip"><span class="chip__k">Sensitivity</span><span class="chip__v" id="chipSens">1.0x</span></div>
+      </div>
+    </div>
+
+    <footer class="controller__foot">
+      <div class="foot-row">
+        <button class="btn btn--surface btn--xl" id="btnCalibrate">
+          <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M12 8a4 4 0 1 0 4 4 4 4 0 0 0-4-4Zm0 6a2 2 0 1 1 2-2 2 2 0 0 1-2 2Zm9-3h-2.06A7 7 0 0 0 13 5.06V3h-2v2.06A7 7 0 0 0 5.06 11H3v2h2.06A7 7 0 0 0 11 18.94V21h2v-2.06A7 7 0 0 0 18.94 13H21Zm-9 6a5 5 0 1 1 5-5 5 5 0 0 1-5 5Z"/></svg>
+          <span>Calibrate Center</span>
+        </button>
+      </div>
+      <nav class="quicknav">
+        <button class="qbtn" id="btnOpenSensors">
+          <svg viewBox="0 0 24 24" width="18" height="18"><path fill="currentColor" d="M3 13h3.2l2.1 5.6a1 1 0 0 0 1.88-.04l3.02-9.06 1.9 4.85a1 1 0 0 0 .93.65H21v-2h-5.28l-2.6-6.63a1 1 0 0 0-1.87.05L8.22 15.5l-1.3-3.16A1 1 0 0 0 6 11.7H3Z"/></svg>
+          <span>Sensors</span>
+        </button>
+        <button class="qbtn" id="btnOpenDemo">
+          <svg viewBox="0 0 24 24" width="18" height="18"><path fill="currentColor" d="M5 11 6.5 6.5A2 2 0 0 1 8.4 5h7.2a2 2 0 0 1 1.9 1.5L19 11h.5A1.5 1.5 0 0 1 21 12.5V18a1 1 0 0 1-1 1h-1a1 1 0 0 1-1-1v-1H6v1a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-5.5A1.5 1.5 0 0 1 4.5 11Zm2.1 0h8.8l-1-3.2a.6.6 0 0 0-.57-.4H9.17a.6.6 0 0 0-.57.4ZM7 15.5A1.25 1.25 0 1 0 5.75 14.25 1.25 1.25 0 0 0 7 15.5Zm10 0A1.25 1.25 0 1 0 15.75 14.25 1.25 1.25 0 0 0 17 15.5Z"/></svg>
+          <span>Demo</span>
+        </button>
+        <button class="qbtn" data-goto="view-connect">
+          <i class="dot" id="navLinkDot"></i>
+          <span>Connect</span>
+        </button>
+      </nav>
+    </footer>
+  </section>
+
+
+  <!-- ============================================================= -->
+  <!-- 3. SETTINGS                                                   -->
+  <!-- ============================================================= -->
+  <section class="view view--settings" id="view-settings">
+    <header class="topbar topbar--nav">
+      <button class="icon-btn" data-back aria-label="Back">
+        <svg viewBox="0 0 24 24" width="22" height="22"><path fill="currentColor" d="m10.8 18.7-6-6a1 1 0 0 1 0-1.4l6-6 1.4 1.4L7.9 11H20v2H7.9l4.3 4.3Z"/></svg>
+      </button>
+      <h2 class="topbar__title topbar__title--nav">Settings</h2>
+      <button class="text-btn text-btn--danger" id="btnReset">Reset</button>
+    </header>
+
+    <div class="scroller">
+      <p class="group-label">Steering</p>
+      <div class="card">
+        <div class="row row--slider">
+          <div class="row__head"><span class="row__name">Sensitivity</span><span class="row__val" id="valSens">1.0x</span></div>
+          <input type="range" id="inSens" class="slider slider--blue" min="0.5" max="3" step="0.1" value="1">
+        </div>
+        <div class="row row--slider">
+          <div class="row__head"><span class="row__name">Dead Zone</span><span class="row__val" id="valDead">3°</span></div>
+          <input type="range" id="inDead" class="slider slider--amber" min="0" max="10" step="0.5" value="3">
+        </div>
+        <div class="row row--slider">
+          <div class="row__head">
+            <div>
+              <span class="row__name">Max Steering Angle</span>
+              <span class="row__hint">How far you turn to reach full lock</span>
+            </div>
+            <span class="row__val" id="valMax">90°</span>
+          </div>
+          <input type="range" id="inMax" class="slider slider--red" min="30" max="540" step="10" value="90">
+        </div>
+        <div class="row row--slider">
+          <div class="row__head"><span class="row__name">Smoothing</span><span class="row__val" id="valSmooth">Medium</span></div>
+          <input type="range" id="inSmooth" class="slider slider--blue" min="0" max="100" step="1" value="45">
+        </div>
+        <div class="row">
+          <div class="row__head"><span class="row__name">Invert Direction</span>
+            <button class="switch" id="swInvert" role="switch" aria-checked="false"><i></i></button>
+          </div>
+        </div>
+      </div>
+
+      <p class="group-label">Display</p>
+      <div class="card">
+        <div class="row">
+          <div class="row__head">
+            <span class="row__name">Theme</span>
+            <div class="seg" id="segTheme">
+              <button data-theme-opt="auto" class="is-on">Auto</button>
+              <button data-theme-opt="light">Light</button>
+              <button data-theme-opt="dark">Dark</button>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="row__head">
+            <div>
+              <span class="row__name">Screen Rotation</span>
+              <span class="row__hint">For a phone mounted sideways</span>
+            </div>
+            <div class="seg" id="segRotate">
+              <button data-rot="auto" class="is-on">Auto</button>
+              <button data-rot="270" aria-label="Rotate left">&#8634;</button>
+              <button data-rot="90" aria-label="Rotate right">&#8635;</button>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="row__head"><span class="row__name">Show Sensor Data</span>
+            <button class="switch" id="swSensors" role="switch" aria-checked="false"><i></i></button>
+          </div>
+        </div>
+        <div class="row">
+          <div class="row__head"><span class="row__name">Keep Screen Awake</span>
+            <button class="switch is-on" id="swWake" role="switch" aria-checked="true"><i></i></button>
+          </div>
+        </div>
+      </div>
+
+      <p class="group-label">Demo</p>
+      <div class="card">
+        <div class="row">
+          <div class="row__head">
+            <div>
+              <span class="row__name">Demo Mode</span>
+              <span class="row__hint">Test steering with a virtual car</span>
+            </div>
+            <button class="switch" id="swDemo" role="switch" aria-checked="false"><i></i></button>
+          </div>
+        </div>
+      </div>
+
+      <p class="group-label">Output</p>
+      <div class="card">
+        <div class="row">
+          <div class="row__head">
+            <div>
+              <span class="row__name">Log Steering Value</span>
+              <span class="row__hint">sendSteeringValue() → console</span>
+            </div>
+            <button class="switch is-on" id="swLog" role="switch" aria-checked="true"><i></i></button>
+          </div>
+        </div>
+      </div>
+
+      <p class="foot-note">Mount the phone on your wheel, hold it at the straight-ahead position and tap <b>Calibrate Center</b>. All steering is measured relative to that point — never from the compass heading.</p>
+    </div>
+  </section>
+
+
+  <!-- ============================================================= -->
+  <!-- 4. DEMO MODE                                                  -->
+  <!-- ============================================================= -->
+  <section class="view view--demo" id="view-demo">
+    <canvas id="road" class="road"></canvas>
+
+    <div class="demo__car" id="demoCar" aria-hidden="true">
+      <svg viewBox="0 0 220 140">
+        <defs>
+          <linearGradient id="cBody" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#f4f6fa"/><stop offset=".5" stop-color="#c8cdd6"/><stop offset="1" stop-color="#8d93a0"/>
+          </linearGradient>
+          <linearGradient id="cGlass" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#4b5566"/><stop offset="1" stop-color="#12161d"/>
+          </linearGradient>
+          <linearGradient id="cLamp" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0" stop-color="#ff1b3d" stop-opacity=".3"/><stop offset=".5" stop-color="#ff6b7d"/><stop offset="1" stop-color="#ff1b3d" stop-opacity=".3"/>
+          </linearGradient>
+          <filter id="cGlow" x="-80%" y="-400%" width="260%" height="900%"><feGaussianBlur stdDeviation="5"/></filter>
+          <filter id="cShadow" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="7"/></filter>
+        </defs>
+        <ellipse cx="110" cy="124" rx="86" ry="11" fill="#000" opacity=".55" filter="url(#cShadow)"/>
+        <path d="M26 112 Q22 60 48 44 L70 24 Q110 12 150 24 L172 44 Q198 60 194 112 Z" fill="url(#cBody)"/>
+        <path d="M74 30 Q110 20 146 30 L160 46 Q110 38 60 46 Z" fill="#1b2029" opacity=".92"/>
+        <path d="M30 74 Q110 62 190 74" fill="none" stroke="#fff" stroke-opacity=".5" stroke-width="2"/>
+        <g filter="url(#cGlow)"><rect x="38" y="80" width="144" height="8" rx="4" fill="url(#cLamp)"/></g>
+        <rect x="38" y="80.5" width="144" height="7" rx="3.5" fill="url(#cLamp)"/>
+        <path d="M32 106 L188 106 L184 120 Q110 126 36 120 Z" fill="#14181f"/>
+        <rect x="18" y="98" width="16" height="26" rx="6" fill="#0a0c10"/>
+        <rect x="186" y="98" width="16" height="26" rx="6" fill="#0a0c10"/>
+      </svg>
+    </div>
+
+    <header class="demo__bar">
+      <button class="icon-btn icon-btn--blur" data-back aria-label="Back">
+        <svg viewBox="0 0 24 24" width="22" height="22"><path fill="currentColor" d="m10.8 18.7-6-6a1 1 0 0 1 0-1.4l6-6 1.4 1.4L7.9 11H20v2H7.9l4.3 4.3Z"/></svg>
+      </button>
+      <span class="demo__title">Demo Mode</span>
+      <div class="demo__tools">
+        <button class="icon-btn icon-btn--blur" id="btnDemoCal" aria-label="Calibrate center">
+          <svg viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M12 8a4 4 0 1 0 4 4 4 4 0 0 0-4-4Zm0 6a2 2 0 1 1 2-2 2 2 0 0 1-2 2Zm9-3h-2.06A7 7 0 0 0 13 5.06V3h-2v2.06A7 7 0 0 0 5.06 11H3v2h2.06A7 7 0 0 0 11 18.94V21h2v-2.06A7 7 0 0 0 18.94 13H21Z"/></svg>
+        </button>
+        <button class="icon-btn icon-btn--blur" id="btnFullscreen" aria-label="Fullscreen">
+          <svg viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M4 9V4h5v2H6v3Zm11-5h5v5h-2V6h-3Zm5 11v5h-5v-2h3v-3ZM9 20H4v-5h2v3h3Z"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <div class="hud">
+      <div class="hud__cell"><span class="hud__k">Speed</span><span class="hud__v" id="hudSpeed">0</span><span class="hud__u">km/h</span></div>
+      <div class="hud__cell"><span class="hud__k">Gear</span><span class="hud__v" id="hudGear">1</span></div>
+      <div class="hud__cell hud__cell--wide"><span class="hud__k">Steering</span><span class="hud__v" id="hudSteer">0</span>
+        <div class="minibar"><i id="hudBar"></i></div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ============================================================= -->
+  <!-- 5. CONNECT                                                    -->
+  <!-- ============================================================= -->
+  <section class="view view--connect" id="view-connect">
+    <header class="topbar topbar--nav">
+      <button class="icon-btn" data-back aria-label="Back">
+        <svg viewBox="0 0 24 24" width="22" height="22"><path fill="currentColor" d="m10.8 18.7-6-6a1 1 0 0 1 0-1.4l6-6 1.4 1.4L7.9 11H20v2H7.9l4.3 4.3Z"/></svg>
+      </button>
+      <span></span>
+      <button class="icon-btn" id="btnConnectInfo" aria-label="About">
+        <svg viewBox="0 0 24 24" width="22" height="22"><path fill="currentColor" d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2Zm1 15h-2v-6h2Zm0-8h-2V7h2Z"/></svg>
+      </button>
+    </header>
+
+    <div class="scroller scroller--center">
+      <div class="link-art" aria-hidden="true">
+        <svg viewBox="0 0 120 60" width="150" height="75">
+          <g fill="none" stroke="#3f8bff" stroke-width="3.5" stroke-linecap="round">
+            <path d="M14 30a10 10 0 0 1 0-14" opacity=".95"/>
+            <path d="M8 34a17 17 0 0 1 0-22" opacity=".65"/>
+            <path d="M2 38a24 24 0 0 1 0-30" opacity=".35"/>
+          </g>
+          <circle cx="36" cy="30" r="3" fill="#3f8bff"/>
+          <circle cx="48" cy="30" r="2.2" fill="#3f8bff" opacity=".5"/>
+          <g fill="none" stroke="currentColor" stroke-width="3.5" stroke-linejoin="round">
+            <rect x="66" y="10" width="46" height="32" rx="3"/>
+            <path d="M80 50h18M89 42v8"/>
+          </g>
+        </svg>
+      </div>
+
+      <h2 class="connect__title">Ready to Connect</h2>
+      <p class="connect__sub">Steering is streamed to your PC over WebSocket and fed straight into your game.</p>
+
+      <div class="card card--pad">
+        <p class="card__label">Link Status</p>
+        <div class="link-row"><i class="dot" id="linkDot"></i><b id="linkText">Starting…</b></div>
+        <div class="link-sub">Input driver: <span id="linkDriver">—</span></div>
+
+        <p class="card__label card__label--sp">Input Mode</p>
+        <div class="seg seg--wide" id="segMode">
+          <button data-mode="browser">Browser</button>
+          <button data-mode="keyboard">Keyboard</button>
+          <button data-mode="gamepad">Gamepad</button>
+        </div>
+        <p class="link-sub link-sub--note"><b>Browser</b> for games in a browser tab. <b>Keyboard</b> for native keyboard games. <b>Gamepad</b> for native games with controller support — best feel, but browsers cannot see it.</p>
+
+        <button class="btn btn--surface link-retry" id="btnRelink">Reconnect</button>
+      </div>
+
+      <div class="card card--pad">
+        <p class="card__label">Your Steering Value</p>
+        <div class="connect__value" id="connectValue">0</div>
+        <div class="bipolar"><i id="connectBar"></i><span class="bipolar__tick"></span></div>
+        <div class="bipolar__ends"><span>&minus;100</span><span>+100</span></div>
+      </div>
+
+      <div class="card card--pad">
+        <p class="card__label card__label--lg">Connection Guide</p>
+        <ol class="steps">
+          <li><span class="steps__n">1</span>Run <code>node bridge.js</code> on your PC</li>
+          <li><span class="steps__n">2</span>Open this page from that PC's address</li>
+          <li><span class="steps__n">3</span>Click your game so it has focus</li>
+          <li><span class="steps__n">4</span>Calibrate centre, then drive</li>
+        </ol>
+      </div>
+
+      <p class="foot-note">Input goes to whichever window is focused on your PC, so click the game after connecting. If it steers the wrong way, turn on <b>Invert Direction</b> in Settings.</p>
+    </div>
+  </section>
+
+
+  <!-- ============================================================= -->
+  <!-- SENSOR DATA SHEET                                             -->
+  <!-- ============================================================= -->
+  <div class="sheet-wrap" id="sensorSheet" aria-hidden="true">
+    <div class="sheet-scrim" data-close-sheet></div>
+    <div class="sheet" role="dialog" aria-label="Sensor data">
+      <header class="sheet__head">
+        <h2>Sensor Data</h2>
+        <button class="icon-btn" data-close-sheet aria-label="Close">
+          <svg viewBox="0 0 24 24" width="22" height="22"><path fill="currentColor" d="M18.3 7.1 13.4 12l4.9 4.9-1.4 1.4L12 13.4l-4.9 4.9-1.4-1.4L10.6 12 5.7 7.1l1.4-1.4L12 10.6l4.9-4.9Z"/></svg>
+        </button>
+      </header>
+      <div class="sheet__body">
+        <div class="dlist">
+          <div class="drow"><span>Alpha (Z)</span><b class="v-blue" id="dAlpha">—</b></div>
+          <div class="drow"><span>Beta (X)</span><b class="v-amber" id="dBeta">—</b></div>
+          <div class="drow"><span>Gamma (Y)</span><b class="v-red" id="dGamma">—</b></div>
+          <div class="drow"><span>Steering Angle</span><b id="dAngle">—</b></div>
+          <div class="drow"><span>Steering Value</span><b class="v-blue" id="dValue">—</b></div>
+        </div>
+
+        <p class="group-label group-label--tight">Sensor Status</p>
+        <div class="dlist dlist--plain">
+          <div class="drow"><span>Device Orientation</span><b><i class="dot" id="dOrientDot"></i><span id="dOrient">Checking…</span></b></div>
+          <div class="drow"><span>Motion Permission</span><b><i class="dot" id="dPermDot"></i><span id="dPerm">Unknown</span></b></div>
+          <div class="drow"><span>Tracking Mode</span><b id="dMode">—</b></div>
+          <div class="drow"><span>Update Rate</span><b id="dRate">0 Hz</b></div>
+        </div>
+
+        <div class="graph">
+          <div class="graph__axis"><span>100</span><span>0</span><span>&minus;100</span></div>
+          <canvas id="graph"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ============================================================= -->
+  <!-- PERMISSION / SUPPORT GATE                                     -->
+  <!-- ============================================================= -->
+  <div class="gate" id="gate" aria-hidden="true">
+    <div class="gate__box" role="dialog" aria-live="polite">
+      <div class="gate__icon" id="gateIcon">
+        <svg viewBox="0 0 24 24" width="30" height="30"><path fill="currentColor" d="M7 2h10a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2Zm0 4v12h10V6Zm5 13.2a1 1 0 1 1-1 1 1 1 0 0 1 1-1Z"/></svg>
+      </div>
+      <h2 id="gateTitle">Enable Motion Sensors</h2>
+      <p id="gateText">This app needs access to your phone's orientation sensors to measure how far you turn the wheel. Nothing leaves your device.</p>
+      <button class="btn btn--primary btn--xl" id="gateAction">Enable Motion Sensors</button>
+      <button class="text-btn" id="gateSecondary" hidden>Continue anyway</button>
+      <p class="gate__hint" id="gateHint"></p>
+    </div>
+  </div>
+
+  <!-- HOW IT WORKS -->
+  <div class="gate" id="howto" aria-hidden="true">
+    <div class="gate__box gate__box--left" role="dialog">
+      <h2>How it works</h2>
+      <ol class="howto">
+        <li><b>Build the wheel.</b> Cut a disc of cardboard and tape your phone flat to the middle, screen facing you.</li>
+        <li><b>Hold it straight.</b> Grip the wheel in its neutral, straight-ahead position.</li>
+        <li><b>Calibrate.</b> Tap <b>Calibrate Center</b>. That exact orientation becomes 0.</li>
+        <li><b>Drive.</b> Turning left gives you &minus;100, right gives +100. Everything is measured relative to the calibrated centre, not the compass.</li>
+        <li><b>Tune.</b> Raise sensitivity for twitchier steering, raise dead zone if the value drifts at rest, and set max angle to how far you actually turn the cardboard.</li>
+      </ol>
+      <button class="btn btn--surface btn--xl" data-close-howto>Got it</button>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
