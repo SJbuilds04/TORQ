@@ -1,0 +1,22 @@
+# TORQ — Python dependencies
+#
+# NOTHING HERE IS REQUIRED TO RUN TORQ.
+#
+# The keyboard driver (input_driver.py) uses only the Python standard library
+# — ctypes talking to user32.SendInput — so TORQ works out of the box with a
+# clean Python install. Browser games and native keyboard games need nothing
+# from this file.
+#
+# Install it only if you want TRUE ANALOG steering through a virtual Xbox 360
+# controller:
+#
+#     pip install -r requirements.txt
+#
+# That pulls in the ViGEmBus kernel driver and will open a Windows installer
+# window (needs admin approval — no reboot required). Afterwards, restart
+# bridge.js and it switches to gamepad mode automatically.
+#
+# Note: browsers cannot see the virtual pad, so this only helps native games.
+# See the "Why browser games need their own mode" section of README.md.
+
+vgamepad==0.1.0 ; sys_platform == "win32"

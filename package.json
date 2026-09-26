@@ -1,0 +1,33 @@
+{
+  "name": "torq",
+  "version": "1.0.0",
+  "description": "Tilt and Orientation Rotation Controller - turn your phone into a physical racing-game steering wheel.",
+  "main": "bridge.js",
+  "scripts": {
+    "start": "node bridge.js",
+    "browser": "node bridge.js --mode browser",
+    "gamepad": "node bridge.js --mode gamepad",
+    "serve": "node serve.js",
+    "test": "node test-steering.js"
+  },
+  "keywords": [
+    "steering-wheel",
+    "deviceorientation",
+    "motion-sensors",
+    "racing",
+    "gamepad",
+    "websocket",
+    "vigem",
+    "diy",
+    "vanilla-js"
+  ],
+  "author": "Sanyam Jain",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/SJbuilds04/TORQ.git"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "private": true
+}

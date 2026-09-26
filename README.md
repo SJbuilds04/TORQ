@@ -27,7 +27,72 @@ step. The PC side is one Node script and one Python script, both dependency-free
 | `bridge.js` | HTTPS + WebSocket server, launches the input driver |
 | `input_driver.py` | Turns steering values into real Windows input events |
 | `serve.js` | Static HTTPS server only — the app without game control |
-| `test-steering.js` | 40 logic tests — `node test-steering.js` |
+| `test-steering.js` | 50 logic tests — `node test-steering.js` |
+| `requirements.txt` | Optional Python dependency (`vgamepad`) for analog gamepad mode |
+| `package.json` | Metadata and convenience scripts. No dependencies. |
+
+---
+
+## Installation
+
+### What you need
+
+| | |
+| --- | --- |
+| **Windows 10 / 11** | The PC side injects input through the Win32 API. The phone app itself runs anywhere. |
+| **Node.js 18+** | [nodejs.org](https://nodejs.org) — runs the server. Zero npm packages. |
+| **Python 3.8+** | [python.org](https://python.org) — runs the input driver. Zero pip packages needed. |
+| **Git for Windows** | [git-scm.com](https://git-scm.com) — ships the `openssl` used to generate the HTTPS certificate. |
+| **A phone** | Any iPhone or Android with orientation sensors. No app install. |
+| **Same Wi-Fi** | Phone and PC must reach each other. A phone hotspot works. |
+| **Cardboard** | A disc about 28–32 cm across, and tape. |
+
+### Install
+
+```bash
+git clone https://github.com/SJbuilds04/TORQ.git
+cd TORQ
+node bridge.js
+```
+
+That is the whole installation. Nothing to build, nothing to download.
+
+On first run it generates a self-signed HTTPS certificate into `.certs/` and
+prints the address to open on your phone.
+
+### Optional: true analog steering
+
+```bash
+pip install -r requirements.txt
+```
+
+This installs `vgamepad`, which pulls in the ViGEmBus kernel driver and opens a
+Windows installer (admin approval required, **no reboot needed**). Restart
+`bridge.js` afterwards and it switches to gamepad mode by itself.
+
+Skip this if you only play browser games — browsers cannot see a virtual
+gamepad at all. See [Why browser games need their own mode](#why-browser-games-need-their-own-mode).
+
+### Verify it works
+
+```bash
+node test-steering.js      # 50 logic tests, should all pass
+```
+
+To confirm the virtual gamepad specifically, press `Win+R`, run `joy.cpl`,
+open **Properties** and watch the X axis move as you turn the wheel.
+
+### npm scripts
+
+Provided for convenience — they just wrap the same commands.
+
+```bash
+npm start           # node bridge.js
+npm run browser     # force browser-tuned keyboard mode
+npm run gamepad     # force analog gamepad mode
+npm run serve       # serve the app only, no game control
+npm test            # run the test suite
+```
 
 ---
 
@@ -243,9 +308,10 @@ mode removes that entirely — see below.
 node test-steering.js
 ```
 
-40 tests covering permission and sensor-failure states, calibration from
+50 tests covering permission and sensor-failure states, calibration from
 arbitrary poses, left/right/centre behaviour, dead zone, sensitivity,
-normalisation, filter stability, and the flat-phone fallback. `app.js` exports
+normalisation, multi-turn rotation past the ±180° seam, adaptive-filter
+behaviour, and the flat-phone fallback. `app.js` exports
 its pure maths and skips all DOM setup when there is no `document`, so the tests
 run against the real shipping code rather than a copy.
 
