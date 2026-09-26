@@ -357,3 +357,9 @@ for true analog output, which removes it.
 travel — which is correct, but feels like nothing is happening.
 
 **Left and right are swapped.** Turn on Invert Direction in Settings.
+
+---
+
+## License
+
+[MIT](LICENSE) © 2026 Sanyam Jain
